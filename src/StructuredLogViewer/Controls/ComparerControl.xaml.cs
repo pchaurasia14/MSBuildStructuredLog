@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +14,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ICSharpCode.AvalonEdit.Highlighting;
+using Microsoft.Build.Logging.StructuredLogger;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace StructuredLogViewer.Controls
 {
@@ -19,6 +24,22 @@ namespace StructuredLogViewer.Controls
     /// Interaction logic for UserControl1.xaml
     /// </summary>
     public partial class ComparerControl : UserControl
+    {
+        public ComparerControl()
+        {
+            InitializeComponent();
+        }
+
+        public ComparerControl(string leftView, string rightView)
+        {
+            InitializeComponent();
+            DataContext = new CompareControlViewModel(leftView, rightView);
+            searchLogControl.WatermarkContent = new TextBlock { Text = "Work in progress" };
+
+        }
+    }
+
+    public class CompareControlViewModel : ObservableObject
     {
         private string leftView;
         private string rightView;
@@ -29,7 +50,7 @@ namespace StructuredLogViewer.Controls
             set
             {
                 leftView = value;
-                lftText.Text = leftView;
+                RaisePropertyChanged(nameof(LeftView));
             }
         }
 
@@ -39,32 +60,121 @@ namespace StructuredLogViewer.Controls
             set
             {
                 rightView = value;
-                rightText.Text = rightView;
+                RaisePropertyChanged(nameof(RightView));
             }
         }
-        public ComparerControl()
+        private ObservableCollection<LineRecord> leftPaneViewRecords = new();
+        public ObservableCollection<LineRecord> LeftPaneViewRecords
         {
-            InitializeComponent();
+            get => leftPaneViewRecords;
+            set
+            {
+                leftPaneViewRecords = value;
+                RaisePropertyChanged(nameof(LeftPaneViewRecords));
+            }
+        }
+        private ObservableCollection<LineRecord> rightPaneViewRecords = new();
+        public ObservableCollection<LineRecord> RightPaneViewRecords
+        {
+            get => rightPaneViewRecords;
+            set
+            {
+                rightPaneViewRecords = value;
+                RaisePropertyChanged(nameof(RightPaneViewRecords));
+            }
+        }
 
-            //var items = new List<LineRecord>();
+        private ICommand nextDifferenceCommand;
+        public ICommand NextDifferenceCommand => nextDifferenceCommand ??= new Command(NextDifference);
 
-            //items.AddRange(Enumerable.Range(1, 500).Select(i => new LineRecord(i.ToString(), i.ToString(), "None")));
+        private void NextDifference()
+        {
+            
+        }
 
-            //leftPaneView.ItemsSource = items;
+        private ICommand prevDifferenceCommand;
+        public ICommand PrevDifferenceCommand => prevDifferenceCommand ??= new Command(PrevDifference);
+
+        private void PrevDifference()
+        {
+
+        }
+
+        private ICommand dummyCommand;
+        public ICommand DummyCommand => dummyCommand??= new Command(DummyCommandHandle);
+
+        private void DummyCommandHandle()
+        {
+            LeftPaneViewRecords.Last().Background = BackgroundHighlightColor.Red;
+
+            RightPaneViewRecords.First().Background = BackgroundHighlightColor.Green;
+            RightPaneViewRecords.Skip(1).First().Background = BackgroundHighlightColor.Green;
+            RightPaneViewRecords.Skip(3).First().Background = BackgroundHighlightColor.Green;
+        }
+
+        public CompareControlViewModel(string leftView, string rightView)
+        {
+            LeftView = leftView;
+            RightView = rightView;
+
+            GetRecords(LeftView).ForEach(LeftPaneViewRecords.Add);
+            GetRecords(RightView).ForEach(RightPaneViewRecords.Add);
+        }
+
+        private static List<LineRecord> GetRecords(string fileName)
+        {
+            return System.IO.File.ReadLines(fileName)
+               .Select((rec, index) => new LineRecord((index + 1).ToString(), rec, BackgroundHighlightColor.None))
+               .ToList();
         }
     }
 
-    public class LineRecord
+    public class LineRecord : ObservableObject
     {
+        private BackgroundHighlightColor background;
+
         public string LineNumber { get; }
         public string Text { get; }
-        public string Background { get; }
+        public BackgroundHighlightColor Background
+        {
+            get => background;
+            set
+            {
+                background = value;
+                RaisePropertyChanged(nameof(Background));
+            }
+        }
 
-        public LineRecord(string lineNumber, string text, string background)
+        public LineRecord(string lineNumber, string text, BackgroundHighlightColor background)
         {
             LineNumber = lineNumber;
             Text = text;
             Background = background;
+        }
+    }
+
+    public enum BackgroundHighlightColor { Green, Red, None }
+
+    public class BackgroundColorConverter : IValueConverter
+    {
+        private readonly SolidColorBrush None = new SolidColorBrush(Colors.Transparent);
+        private readonly SolidColorBrush Green = new SolidColorBrush(Colors.LightGreen);
+        private readonly SolidColorBrush Red = new SolidColorBrush(Colors.LightSalmon);
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null || value is not BackgroundHighlightColor scb) return None;
+
+            return scb switch
+            {
+                BackgroundHighlightColor.Green => Green,
+                BackgroundHighlightColor.Red => Red,
+                _ => None
+            };
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }

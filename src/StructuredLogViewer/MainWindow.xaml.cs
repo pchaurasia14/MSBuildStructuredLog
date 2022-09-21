@@ -176,10 +176,7 @@ namespace StructuredLogViewer
                 return;
             }
             
-            var comparerControl = new ComparerControl() {
-                LeftView = arg1,
-                RightView = arg2
-            };
+            var comparerControl = new ComparerControl(leftView: arg1, rightView: arg2);
             SetContent(comparerControl);
         }
 

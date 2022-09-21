@@ -7,25 +7,47 @@
              xmlns:structuredLogViewer="clr-namespace:StructuredLogViewer"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <!--<StackPanel Orientation="Vertical">
-        <TextBlock Text="Comparer View"
-                       FontSize="32"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       />
-        <TextBlock Text="Left file"
-                   x:Name="lftText"
-                       FontSize="16"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       />
-        <TextBlock Text="Right file"
-                   x:Name="rightText"
-                       FontSize="16"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       />
-    </StackPanel>-->
+
+    <UserControl.Resources>
+        <local:BackgroundColorConverter x:Key="backgroundColorConverter"/>
+
+        <DataTemplate x:Key="DifViewTemplate">
+            <StackPanel Orientation="Horizontal" Background="{Binding Background,Converter={StaticResource backgroundColorConverter}}">
+                <TextBlock Text="{Binding Path=LineNumber}" Foreground="LightGray" />
+                <TextBlock Text="{Binding Path=Text}" Margin="10,0,0,0" />
+            </StackPanel>
+        </DataTemplate>
+
+        <Style x:Key="DiffTreeHighlighter" TargetType="ListBoxItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContentControl">
+                        <Border
+                            Name="Border"
+                            Background="{TemplateBinding Background}"
+                            Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="ListBoxItem.IsSelected" Value="True">
+                                <Setter
+                                    TargetName="Border"
+                                    Property="Background"
+                                    Value="LightBlue"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <ControlTemplate x:Key="DiffViewControlTemplate">
+            <ScrollViewer>
+                <ItemsPresenter VerticalAlignment="Stretch"></ItemsPresenter>
+            </ScrollViewer>
+        </ControlTemplate>
+
+    </UserControl.Resources>
 
     <local:SplitterPanel FirstChildRelativeSize="1*" SecondChildRelativeSize="3*">
         <local:SplitterPanel.FirstChild>
@@ -42,26 +64,69 @@
                             ItemsSource="{Binding Children}"
                             structuredLogViewer:ScrollViewerHelper.ShiftWheelScrollsHorizontally="True" />-->
 
-            <StackPanel Orientation="Vertical">
-                <TextBlock Text="Comparer View"
-                       FontSize="32"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       />
-                <TextBlock Text="Left file"
-                   x:Name="lftText"
-                       FontSize="16"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       />
-                <TextBlock Text="Right file"
-                   x:Name="rightText"
-                       FontSize="16"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       />
-               
-            </StackPanel>
+            <Grid Background="White">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.ColumnSpan="2">
+                    <Button
+                        Content="Next Difference"
+                        Height="30" Width="90"
+                        Margin="10,0,0,0"
+                        Command="{Binding NextDifferenceCommand}"/>
+                    <Button
+                        Content="Prev Difference"
+                        Height="30"
+                        Width="90"
+                        Margin="10,0,0,0"
+                        Command="{Binding PrevDifferenceCommand}"/>
+                    <Button
+                        Content="Dummy"
+                        Height="30"
+                        Width="90"
+                        Margin="10,0,0,0"
+                        Command="{Binding DummyCommand}"/>
+                </StackPanel>
+                <TextBlock 
+                    x:Name="lftText"
+                    Grid.Column="0"
+                    Grid.Row="1"
+                    TextWrapping="Wrap"
+                    Text="{Binding LeftView}"
+                    />
+                <ListView 
+                    x:Name="leftPaneView"
+                    Grid.Column="0"
+                    Grid.Row="2"
+                    ItemsSource="{Binding LeftPaneViewRecords}"
+                    Template="{StaticResource ResourceKey=DiffViewControlTemplate}"
+                    ItemTemplate="{StaticResource ResourceKey=DifViewTemplate}"
+                    ItemContainerStyle="{StaticResource DiffTreeHighlighter}"
+                    ScrollViewer.VerticalScrollBarVisibility="Visible" />
+
+                <TextBlock 
+                    x:Name="rightText"
+                    Grid.Column="1"
+                    Grid.Row="1"
+                    TextWrapping="Wrap"
+                    Text="{Binding RightView}" />
+                <ListView 
+                    x:Name="rightPaneView"
+                    Grid.Column="1"
+                    Grid.Row="2"
+                    ItemsSource="{Binding RightPaneViewRecords}"
+                    Template="{StaticResource ResourceKey=DiffViewControlTemplate}"
+                    ItemTemplate="{StaticResource ResourceKey=DifViewTemplate}"
+                    ItemContainerStyle="{StaticResource DiffTreeHighlighter}"
+                    ScrollViewer.VerticalScrollBarVisibility="Visible">
+                </ListView>
+            </Grid>
         </local:SplitterPanel.SecondChild>
 
     </local:SplitterPanel>
