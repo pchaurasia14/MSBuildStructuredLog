@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net472;net6.0-windows</TargetFrameworks>
@@ -11,6 +11,7 @@
     <Company>Microsoft</Company>
     <Product>MSBuild Structured Log Viewer</Product>
     <AssemblyTitle>MSBuild Structured Log Viewer</AssemblyTitle>
+    <Platforms>x86</Platforms>
   </PropertyGroup>
 
   <ItemGroup Condition="$(TargetFramework) == 'net472'">
@@ -53,10 +54,7 @@
       <TaskRunnerFile Include="$(CoreTaskRunnerOutDir)TaskRunner.dll" />
       <TaskRunnerFile Include="$(CoreTaskRunnerOutDir)TaskRunner.runtimeconfig.json" />
     </ItemGroup>
-    <Copy SourceFiles="@(TaskRunnerFile)"
-        Condition="Exists(@(TaskRunnerFile->'%(FullPath)'))"
-        DestinationFolder="$(OutDir)"
-        SkipUnchangedFiles="True" />
+    <Copy SourceFiles="@(TaskRunnerFile)" Condition="Exists(@(TaskRunnerFile->'%(FullPath)'))" DestinationFolder="$(OutDir)" SkipUnchangedFiles="True" />
   </Target>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'net472'">
@@ -76,49 +74,22 @@
     <ChocolateyInput Include="$(MSBuildThisFileFullPath)" />
   </ItemGroup>
 
-  <Target Name="ExtractVersion"
-          AfterTargets="CoreBuild"
-          Condition="Exists('$(NuspecPath)')"
-          DependsOnTargets="PrepareResources;GenerateAssemblyNBGVVersionInfo">
+  <Target Name="ExtractVersion" AfterTargets="CoreBuild" Condition="Exists('$(NuspecPath)')" DependsOnTargets="PrepareResources;GenerateAssemblyNBGVVersionInfo">
     <PropertyGroup>
       <NupkgPath>$(OutDir)$(NuspecFileName).$(Version).nupkg</NupkgPath>
       <ChocolateyNupkgPath>$(OutDir)$(ChocolateyFileName).$(Version).nupkg</ChocolateyNupkgPath>
     </PropertyGroup>
   </Target>
 
-  <Target Name="BuildNuGet"
-          AfterTargets="ExtractVersion"
-          Condition="Exists('$(NuspecPath)')"
-          DependsOnTargets="ExtractVersion"
-          Inputs="@(NuGetInput)"
-          Outputs="$(NupkgPath)">
-    <PackTask
-        PackItem="$(NuspecPath)"
-        NuspecFile="$(NuspecPath)"
-        NuspecBasePath="$(OutDir)"
-        NuspecProperties="currentVersion=$(Version)"
-        NuspecOutputPath="$(NuspecOutputPath)"
-        PackageOutputPath="$(OutDir)"
-        RestoreOutputPath="$(RestoreOutputPath)"
-        SymbolPackageFormat="snupkg"
-        />
+  <Target Name="BuildNuGet" AfterTargets="ExtractVersion" Condition="Exists('$(NuspecPath)')" DependsOnTargets="ExtractVersion" Inputs="@(NuGetInput)" Outputs="$(NupkgPath)">
+    <!--<PackTask PackItem="$(NuspecPath)" NuspecFile="$(NuspecPath)" NuspecBasePath="$(OutDir)" NuspecProperties="currentVersion=$(Version)" NuspecOutputPath="$(NuspecOutputPath)" PackageOutputPath="$(OutDir)" RestoreOutputPath="$(RestoreOutputPath)" SymbolPackageFormat="snupkg" />-->
   </Target>
 
-  <Target Name="BuildChocolatey"
-          AfterTargets="ExtractVersion"
-          Condition="Exists('$(ChocolateyNuspecPath)') AND Exists('C:\ProgramData\chocolatey\choco.exe')"
-          DependsOnTargets="ExtractVersion"
-          Inputs="@(ChocolateyInput)"
-          Outputs="$(ChocolateyNupkgPath)">
+  <Target Name="BuildChocolatey" AfterTargets="ExtractVersion" Condition="Exists('$(ChocolateyNuspecPath)') AND Exists('C:\ProgramData\chocolatey\choco.exe')" DependsOnTargets="ExtractVersion" Inputs="@(ChocolateyInput)" Outputs="$(ChocolateyNupkgPath)">
     <Exec Command="C:\ProgramData\chocolatey\choco.exe Pack &quot;$(ChocolateyNuspecPath)&quot; -OutputDirectory $(OutDir) currentVersion=$(Version) outdir=$(OutDir)" />
   </Target>
 
-  <Target Name="SquirrelReleasify"
-          AfterTargets="BuildNuGet"
-          Condition="Exists('$(NupkgPath)')"
-          DependsOnTargets="BuildNuGet"
-          Inputs="$(NupkgPath)"
-          Outputs="$(OutDir)Releases\MSBuildStructuredLogSetup.exe">
+  <Target Name="SquirrelReleasify" AfterTargets="BuildNuGet" Condition="Exists('$(NupkgPath)')" DependsOnTargets="BuildNuGet" Inputs="$(NupkgPath)" Outputs="$(OutDir)Releases\MSBuildStructuredLogSetup.exe">
     <Exec Command="&quot;$(PkgSquirrel_Windows)\tools\Squirrel.exe&quot; --releaseDir=$(OutDir)Releases --releasify $(NupkgPath)" />
     <Copy SourceFiles="$(OutDir)Releases\Setup.exe" DestinationFiles="$(OutDir)Releases\MSBuildStructuredLogSetup.exe" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
     <Delete Files="$(OutDir)Releases\Setup.exe" />

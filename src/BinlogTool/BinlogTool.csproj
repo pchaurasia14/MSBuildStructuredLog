@@ -20,6 +20,7 @@
     <PackageIcon>msbuild-structured-log-viewer.png</PackageIcon>
     <RepositoryUrl>https://github.com/KirillOsenkov/MSBuildStructuredLog</RepositoryUrl>
     <PackageTags>MSBuild Log Logger Structure Structured Binlog BinlogTool</PackageTags>
+    <Platforms>AnyCPU;x64;x86</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="$(IconFilePath)" Pack="true" PackagePath=""/>
+    <None Include="$(IconFilePath)" Pack="true" PackagePath="" />
   </ItemGroup>
 
 </Project>

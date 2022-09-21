@@ -1,4 +1,4 @@
-﻿<Application xmlns="https://github.com/avaloniaui"
+<Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:l="clr-namespace:Microsoft.Build.Logging.StructuredLogger;assembly=StructuredLogger"
              xmlns:common="clr-namespace:Microsoft.Build.Logging.StructuredLogger;assembly=StructuredLogViewer.Core"
@@ -457,7 +457,7 @@
                       VerticalAlignment="Center">
                     <Rectangle Fill="Black" />
                     <Grid Background="White"
-                          RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+                          RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
                         <TextBlock Name="customMessage"
                                    Grid.Row="0"
                                    FontSize="16"
@@ -470,7 +470,7 @@
                         -->
                         <Grid Name="openLogOrProjectCompartment"
                               Grid.Row="1"
-                              ColumnDefinitions="Auto,Auto">
+                              ColumnDefinitions="Auto,Auto,Auto">
                             <Button Margin="20"
                                     MinWidth="200"
                                     MinHeight="200"
@@ -549,9 +549,37 @@
                                                HorizontalAlignment="Center" />
                                 </StackPanel>
                             </Button>
+                            <Button Margin="0,20,20,20" MinWidth="200" MinHeight="200" Command="{Binding ToggleCompareDialogCommand}" Grid.Column="2">
+                                <StackPanel>
+                                    <Rectangle Width="100" Height="100" Margin="20" Fill="{StaticResource SlnIcon}" />
+                                    <TextBlock Text="Compare binlogs" FontSize="16" Margin="10" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                        <Grid x:Name="compareFiles" Grid.Row="2" IsVisible="{Binding ShowCompareDialog, Converter={StaticResource booleanToVisibilityConverter}}" >
+                            <Expander IsExpanded="True"  Header="Select files to compare" Margin="10">
+                                <StackPanel Orientation="Vertical">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="File #1" />
+                                        <TextBox x:Name="txtCmprFile1" Text="{Binding FileToCompare1}" IsReadOnly="True" />
+                                        <Button Content="Select File" HorizontalContentAlignment="Right"  Command="{Binding OpenFile1DialogCommand}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="File #2" />
+                                        <TextBox x:Name="txtCmprFile2" Text="{Binding FileToCompare2}" IsReadOnly="True" />
+                                        <Button Content="Select File" HorizontalAlignment="Right" Command="{Binding OpenFile2DialogCommand}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Content="Compare"
+                                                Command="{Binding CompareLogFilesCommand}"
+                                                IsEnabled="{Binding EnableLogFileComparison}"
+                                                HorizontalAlignment="Right"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Expander>
                         </Grid>
                         <Grid Name="recentProjects"
-                              Grid.Row="2"
+                              Grid.Row="3"
                               IsVisible="{Binding ShowRecentProjects}">
                             <Expander IsExpanded="True"
                                       Header="Recent projects and solutions"
@@ -565,7 +593,7 @@
                             </Expander>
                         </Grid>
                         <Grid Name="recentLogs"
-                              Grid.Row="3"
+                              Grid.Row="4"
                               IsVisible="{Binding ShowRecentLogs}">
                             <Expander IsExpanded="True"
                                       Header="Recent logs"
@@ -578,7 +606,7 @@
                                          BorderThickness="0" />
                             </Expander>
                         </Grid>
-                        <StackPanel Grid.Row="4">
+                        <StackPanel Grid.Row="5">
                             <CheckBox Content="Enable tree virtualization (faster, but may cause hangs)"
                                       Margin="10,0,10,10"
                                       IsChecked="{Binding EnableVirtualization}"

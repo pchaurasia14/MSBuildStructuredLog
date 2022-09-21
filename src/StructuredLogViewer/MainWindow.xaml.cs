@@ -145,8 +145,58 @@ namespace StructuredLogViewer
             welcomeScreen.OpenProjectRequested += () => OpenProjectOrSolution();
             welcomeScreen.OpenLogFileRequested += () => OpenLogFile();
             welcomeScreen.PropertyChanged += WelcomeScreen_PropertyChanged;
+            //welcomeScreen.OpenFileToCompare += (string param) => OpenFileToCompare((p, r) => {
+            //    if (p == "File1")
+            //    {
+            //        welcomeScreen.FileToCompare1 = r;
+            //    }
+            //    else if (p == "File2")
+            //    {
+            //        welcomeScreen.FileToCompare2 = r;
+            //    }
+            //}, param);
+
+            //welcomeScreen.OpenFileToCompare += (arg) =>
+            //{
+            //    Console.WriteLine(arg);
+            //};
+
+            welcomeScreen.OpenFile1DialogWindow += () => OpenFileToCompare(r => welcomeScreen.FileToCompare1 = r);
+            welcomeScreen.OpenFile2DialogWindow += () => OpenFileToCompare(r => welcomeScreen.FileToCompare2 = r);
+
+            welcomeScreen.CompareLogFilesRequested += WelcomeScreen_CompareLogFilesRequested;
+
             UpdateRecentItemsMenu();
         }
+        private void WelcomeScreen_CompareLogFilesRequested(string arg1, string arg2)
+        {
+            if(arg1 == arg2)
+            {
+                DialogService.ShowMessageBox($"Both files are identical. Please select different files.");
+                return;
+            }
+            
+            var comparerControl = new ComparerControl() {
+                LeftView = arg1,
+                RightView = arg2
+            };
+            SetContent(comparerControl);
+        }
+
+        private void OpenFileToCompare(Action<string> screenAction)
+        {
+            var openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = Serialization.OpenFileDialogFilter;
+            openFileDialog.Title = "Open a build log file";
+            openFileDialog.CheckFileExists = true;
+            var result = openFileDialog.ShowDialog(this);
+            if (result != true)
+            {
+                return;
+            }
+            screenAction(openFileDialog.FileName);
+        }
+
 
         private void WelcomeScreen_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {

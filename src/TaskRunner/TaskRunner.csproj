@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFrameworks>net472;net6.0</TargetFrameworks>
+    <Platforms>AnyCPU;x64;x86</Platforms>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(TargetFramework) == 'net472'">

@@ -1,9 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <NBGV_DoNotEmitNonVersionCustomAttributes>true</NBGV_DoNotEmitNonVersionCustomAttributes>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <Platforms>AnyCPU;x64;x86</Platforms>
   </PropertyGroup>
   <PropertyGroup>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -48,7 +49,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="$(IconFilePath)" Pack="true" PackagePath=""/>
+    <None Include="$(IconFilePath)" Pack="true" PackagePath="" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
     <StartAction>Program</StartAction>

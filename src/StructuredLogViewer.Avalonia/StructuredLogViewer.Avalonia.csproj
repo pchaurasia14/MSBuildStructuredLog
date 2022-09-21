@@ -9,6 +9,7 @@
       https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json;
       $(RestoreAdditionalProjectSources)
     </RestoreAdditionalProjectSources>
+    <Platforms>AnyCPU;x64;x86</Platforms>
   </PropertyGroup>
   
   <ItemGroup>
