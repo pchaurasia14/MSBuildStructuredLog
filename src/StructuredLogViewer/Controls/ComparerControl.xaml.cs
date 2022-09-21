@@ -106,6 +106,7 @@ namespace StructuredLogViewer.Controls
         private void DummyCommandHandle()
         {
             LeftPaneViewRecords.Last().Background = BackgroundHighlightColor.Red;
+            LeftPaneViewRecords.Insert(LeftPaneViewRecords.Count - 2, LineRecord.EmptyLine);
 
             RightPaneViewRecords.First().Background = BackgroundHighlightColor.Green;
             RightPaneViewRecords.Skip(1).First().Background = BackgroundHighlightColor.Green;
@@ -131,6 +132,7 @@ namespace StructuredLogViewer.Controls
 
     public class LineRecord : ObservableObject
     {
+        public static readonly LineRecord EmptyLine = new LineRecord("","", BackgroundHighlightColor.None);
         private BackgroundHighlightColor background;
 
         public string LineNumber { get; }
