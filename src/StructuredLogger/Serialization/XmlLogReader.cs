@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Xml;
+using System.Xml.Serialization;
 
 namespace Microsoft.Build.Logging.StructuredLogger
 {
@@ -9,12 +12,21 @@ namespace Microsoft.Build.Logging.StructuredLogger
     {
         private StringCache stringTable;
         private XmlReader reader;
+        private XmlTextReader textReader;
+        
         private readonly List<KeyValuePair<string, string>> attributes = new List<KeyValuePair<string, string>>(10);
 
         public static Build ReadFromXml(string xmlFilePath)
         {
             var build = new XmlLogReader().Read(xmlFilePath);
             return build;
+        }
+
+        public static List<string> ReadTextFromXml(string xmlFilePath)
+        {
+            XmlLogReader logReader = new XmlLogReader();
+            return logReader.ReadText(xmlFilePath);
+            
         }
 
         public static Build ReadFromXml(Stream stream)
@@ -29,6 +41,14 @@ namespace Microsoft.Build.Logging.StructuredLogger
                 var build = Read(stream);
                 build.LogFilePath = filePath;
                 return build;
+            }
+        }
+
+        public List<string> ReadText(string filePath)
+        {
+            using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                return ReadText(stream);
             }
         }
 
@@ -142,6 +162,23 @@ namespace Microsoft.Build.Logging.StructuredLogger
             }
 
             return build;
+        }
+
+        public List<string> ReadText(Stream stream)
+        {
+            List<string> records = new List<string> ();
+
+            try
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(List<string>));
+                serializer.Serialize(stream, records);
+            }
+            catch (Exception ex)
+            {
+                Debugger.Break();
+            }
+
+            return records;
         }
 
         private void SetElementValue(BaseNode valueNode, string value)
