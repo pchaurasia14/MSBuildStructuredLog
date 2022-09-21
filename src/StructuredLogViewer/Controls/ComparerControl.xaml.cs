@@ -117,9 +117,30 @@ namespace StructuredLogViewer.Controls
         {
             LeftView = leftView;
             RightView = rightView;
-
-            GetRecords(LeftView).ForEach(LeftPaneViewRecords.Add);
-            GetRecords(RightView).ForEach(RightPaneViewRecords.Add);
+            IEnumerable<(ResultType ResultType, string AItem, string BItem)> results = BinLogDiffer.ComputeDiff(leftView, rightView);
+            int li = 0, ri = 0;
+            foreach((ResultType rt, string a, string b) result in results)
+            {
+                switch (result.rt)
+                {
+                    case ResultType.Both:
+                        LeftPaneViewRecords.Add(new LineRecord((li + 1).ToString(), result.a, BackgroundHighlightColor.None));
+                        RightPaneViewRecords.Add(new LineRecord((ri + 1).ToString(), result.b, BackgroundHighlightColor.None));
+                        li += 1;
+                        ri += 1;
+                        break;
+                    case ResultType.A:
+                        LeftPaneViewRecords.Add(new LineRecord((li + 1).ToString(), result.a, BackgroundHighlightColor.Red));
+                        li += 1;
+                        break;
+                    case ResultType.B:
+                        RightPaneViewRecords.Add(new LineRecord((ri + 1).ToString(), result.b, BackgroundHighlightColor.Green));
+                        ri += 1;
+                        break;
+                }
+            }
+            //GetRecords(LeftView).ForEach(LeftPaneViewRecords.Add);
+            //GetRecords(RightView).ForEach(RightPaneViewRecords.Add);
         }
 
         private static List<LineRecord> GetRecords(string fileName)

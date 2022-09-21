@@ -54,9 +54,6 @@
   <ItemGroup>
     <Folder Include="Diffs\" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="Diffs\Diffs.csproj" />
-  </ItemGroup>
   <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
     <StartAction>Program</StartAction>
     <StartProgram>$(MSBuildToolsPath)\MSBuild.exe</StartProgram>
