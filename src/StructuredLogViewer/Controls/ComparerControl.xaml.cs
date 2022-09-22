@@ -17,7 +17,6 @@ using System.Windows.Shapes;
 using ICSharpCode.AvalonEdit.Highlighting;
 using Microsoft.Build.Logging.StructuredLogger;
 using static System.Net.Mime.MediaTypeNames;
-
 namespace StructuredLogViewer.Controls
 {
     /// <summary>
@@ -117,8 +116,9 @@ namespace StructuredLogViewer.Controls
         {
             LeftView = leftView;
             RightView = rightView;
-            IEnumerable<(ResultType ResultType, string AItem, string BItem)> results = BinLogDiffer.ComputeDiff(leftView, rightView);
+            var results = BinLogDiffer.ComputeDiff(leftView, rightView);
             int li = 0, ri = 0;
+
             foreach((ResultType rt, string a, string b) result in results)
             {
                 switch (result.rt)
