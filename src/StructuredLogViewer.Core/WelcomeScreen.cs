@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -117,7 +118,8 @@ namespace Microsoft.Build.Logging.StructuredLogger
 
         public bool EnableLogFileComparison => !string.IsNullOrEmpty(FileToCompare1) && !string.IsNullOrEmpty(FileToCompare2);
 
-        private string fileToCompare1 = @"C:\Users\pchaurasia\Downloads\note.xml";// @"C:\Users\pchaurasia\Downloads\fhl-logs\fhl\CalcDemo.binlog";
+        private string fileToCompare1 = @"E:\fhl\CalcDemo.xml";
+        // @"C:\Users\pchaurasia\Downloads\fhl-logs\fhl\CalcDemo.binlog";
         public string FileToCompare1
         {
             get => fileToCompare1;
@@ -139,7 +141,8 @@ namespace Microsoft.Build.Logging.StructuredLogger
             }
         }
 
-        private string fileToCompare2 = @"C:/Users/pchaurasia/Git/dotnet/wpftestartifacts/Tests.Release.x64/FeatureTests/Text/Data/CFFRasterizerP1_1.xml";//@"C:\Users\pchaurasia\Downloads\fhl-logs\fhl\CalcDemo-badsyntax.binlog";
+        private string fileToCompare2 = @"E:\fhl\CalcDemo-badxaml.xml";
+// C:/Users/pchaurasia/Git/dotnet/wpftestartifacts/Tests.Release.x64/FeatureTests/Text/Data/CFFRasterizerP1_1.xml";//@"C:\Users\pchaurasia\Downloads\fhl-logs\fhl\CalcDemo-badsyntax.binlog";
         public string FileToCompare2
         {
             get => fileToCompare2;
