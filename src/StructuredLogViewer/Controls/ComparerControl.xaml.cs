@@ -43,10 +43,10 @@ namespace StructuredLogViewer.Controls
             //ScrollToNewCurrIndex();
         }
 
-        private void ScrollToNewCurrIndex(int index)
+        private void ScrollToNewCurrIndex(int leftIndex, int rightIndex)
         {
-            leftPaneView.ScrollIntoView(leftPaneView.Items[index]);
-            rightPaneView.ScrollIntoView(rightPaneView.Items[index]);
+            leftPaneView.ScrollIntoView(leftPaneView.Items[leftIndex]);
+            rightPaneView.ScrollIntoView(rightPaneView.Items[rightIndex]);
         }
     }
 
@@ -55,10 +55,11 @@ namespace StructuredLogViewer.Controls
         private string leftView;
         private string rightView;
         private List<(int LineA, int LineB, int CountA, int CountB)> editScript;
-        private List<int> diffIndexes;
+        private List<int> diffLeftIndexes;
+        private List<int> diffRightIndexes;
         private int currIndex = -1;
 
-        public Action<int> scrollTo
+        public Action<int,int> scrollTo
         {
             get; set;
         }
@@ -120,11 +121,11 @@ namespace StructuredLogViewer.Controls
 
         private void NextDifference()
         {
-            if(CurrentIndex < diffIndexes.Count)
+            if(CurrentIndex < diffLeftIndexes.Count)
             {
                 CurrentIndex++;
             }
-            scrollTo?.Invoke(diffIndexes[CurrentIndex]);
+            scrollTo?.Invoke(diffLeftIndexes[CurrentIndex], diffRightIndexes[CurrentIndex]);
         }
 
         private ICommand prevDifferenceCommand;
@@ -136,30 +137,38 @@ namespace StructuredLogViewer.Controls
             {
                 CurrentIndex--;
             }
-            scrollTo?.Invoke(diffIndexes[CurrentIndex]);
+            scrollTo?.Invoke(diffLeftIndexes[CurrentIndex], diffRightIndexes[CurrentIndex]);
         }
 
-        private ICommand dummyCommand;
-        public ICommand DummyCommand => dummyCommand ??= new Command(DummyCommandHandle);
+        //private ICommand dummyCommand;
+        //public ICommand DummyCommand => dummyCommand ??= new Command(DummyCommandHandle);
 
-        private void DummyCommandHandle()
-        {
-            scrollTo?.Invoke(100);
-            //LeftPaneViewRecords.Last().Background = BackgroundHighlightColor.Red;
-            //LeftPaneViewRecords.Insert(LeftPaneViewRecords.Count - 2, LineRecord.EmptyLine);
+        //private void DummyCommandHandle()
+        //{
+        //    scrollTo?.Invoke(100);
+        //    //LeftPaneViewRecords.Last().Background = BackgroundHighlightColor.Red;
+        //    //LeftPaneViewRecords.Insert(LeftPaneViewRecords.Count - 2, LineRecord.EmptyLine);
 
-            //RightPaneViewRecords.First().Background = BackgroundHighlightColor.Green;
-            //RightPaneViewRecords.Skip(1).First().Background = BackgroundHighlightColor.Green;
-            //RightPaneViewRecords.Skip(3).First().Background = BackgroundHighlightColor.Green;
-        }
+        //    //RightPaneViewRecords.First().Background = BackgroundHighlightColor.Green;
+        //    //RightPaneViewRecords.Skip(1).First().Background = BackgroundHighlightColor.Green;
+        //    //RightPaneViewRecords.Skip(3).First().Background = BackgroundHighlightColor.Green;
+        //}
 
         public CompareControlViewModel(string leftView, string rightView)
         {
             LeftView = leftView;
             RightView = rightView;
 
-            string[] lines1 = File.ReadAllLines(leftView);
-            string[] lines2 = File.ReadAllLines(rightView);
+            Build leftBuild = BinaryLog.ReadBuild(LeftView);
+            Build rightBuild = BinaryLog.ReadBuild(RightView);
+
+            string tempDir = System.IO.Path.GetTempPath();
+
+            XmlLogWriter.WriteToXml(leftBuild, tempDir + "leftXml.xml");
+            XmlLogWriter.WriteToXml(rightBuild, tempDir + "rightXml.xml");
+
+            string[] lines1 = File.ReadAllLines(tempDir + "leftXml.xml");
+            string[] lines2 = File.ReadAllLines(tempDir + "rightXml.xml");
 
             editScript = BinLogDiffer.GetEditScript(lines1, lines2).ToList();
 
@@ -171,7 +180,8 @@ namespace StructuredLogViewer.Controls
 
         private void ShowDiff()
         {
-            diffIndexes = new List<int>();
+            diffLeftIndexes = new List<int>();
+            diffRightIndexes = new List<int>();
 
             int leftIndex = 0, rightIndex = 0;
             int leftOffset = 0, rightOffset = 0;
@@ -179,7 +189,8 @@ namespace StructuredLogViewer.Controls
             {
                 leftIndex = diffTuple.LineA + leftOffset;
                 rightIndex = diffTuple.LineB + rightOffset;
-                diffIndexes.Add(leftIndex);
+                diffLeftIndexes.Add(leftIndex);
+                diffRightIndexes.Add(rightIndex);
 
                 if (diffTuple.CountA == 0)
                 {

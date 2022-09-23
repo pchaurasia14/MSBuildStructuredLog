@@ -51,7 +51,7 @@
 
     <local:SplitterPanel FirstChildRelativeSize="1*" SecondChildRelativeSize="3*">
         <local:SplitterPanel.FirstChild>
-            <local:SearchAndResultsControl x:Name="searchLogControl"></local:SearchAndResultsControl>
+            <local:SearchAndResultsControl x:Name="searchLogControl" Visibility="Collapsed"></local:SearchAndResultsControl>
         </local:SplitterPanel.FirstChild>
         <local:SplitterPanel.SecondChild>
 
@@ -86,12 +86,12 @@
                         Width="90"
                         Margin="10,0,0,0"
                         Command="{Binding PrevDifferenceCommand}"/>
-                    <Button
+                    <!--<Button
                         Content="Dummy"
                         Height="30"
                         Width="90"
                         Margin="10,0,0,0"
-                        Command="{Binding DummyCommand}"/>
+                        Command="{Binding DummyCommand}"/>-->
                 </StackPanel>
                 <TextBlock 
                     x:Name="lftText"
