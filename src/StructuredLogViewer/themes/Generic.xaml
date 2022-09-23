@@ -695,31 +695,89 @@
                             </Button>
                             <Button Margin="0,20,20,20" MinWidth="200" MinHeight="200" Command="{Binding ToggleCompareDialogCommand}" Grid.Column="2">
                                 <StackPanel>
-                                    <Rectangle Width="100" Height="100" Margin="20" Fill="{StaticResource SlnIcon}" />
+                                    <Canvas Width="100" Height="100" Margin="20">
+                                        <Canvas.Effect>
+                                            <DropShadowEffect BlurRadius="15" Color="Gray" Opacity="0.5" />
+                                        </Canvas.Effect>
+                                        <Polyline 
+                                            Points="25,25 0,50 25,75 50,50 25,25 25,0" 
+                                            Stroke="LightGreen" StrokeThickness="10"
+                                            Canvas.Left="15" Canvas.Top="30"
+                                            RenderTransformOrigin="0.5,0.5">
+                                            <Polyline.RenderTransform>
+                                                <RotateTransform CenterX="40" CenterY="20"  Angle="45" />
+                                            </Polyline.RenderTransform>
+                                        </Polyline>
+                                        <Polyline 
+                                            Points="25,25 0,50 25,75 50,50 25,25 25,0" 
+                                            Stroke="LightPink" StrokeThickness="10"
+                                            Canvas.Left="15" Canvas.Top="15"
+                                            RenderTransformOrigin="0.5,0.5">
+                                            <Polyline.RenderTransform>
+                                                <RotateTransform  Angle="45" />
+                                            </Polyline.RenderTransform>
+                                        </Polyline>
+                                    </Canvas>
+                                    <!--<Rectangle Width="100" Height="100" Margin="20" Fill="{StaticResource SlnIcon}" />-->
                                     <TextBlock Text="Compare binlogs" FontSize="16" Margin="10" HorizontalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                         </Grid>
                         <Grid x:Name="compareFiles" Grid.Row="2" Visibility="{Binding ShowCompareDialog, Converter={StaticResource booleanToVisibilityConverter}}" >
                             <GroupBox Header="Select files to compare" Margin="10">
-                                <StackPanel Orientation="Vertical">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="File #1" />
-                                        <TextBox x:Name="txtCmprFile1" Text="{Binding FileToCompare1}" IsReadOnly="True" />
-                                        <Button Content="Select File" HorizontalContentAlignment="Right"  Command="{Binding OpenFile1DialogCommand}" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="File #2" />
-                                        <TextBox x:Name="txtCmprFile2" Text="{Binding FileToCompare2}" IsReadOnly="True" />
-                                        <Button Content="Select File" HorizontalAlignment="Right" Command="{Binding OpenFile2DialogCommand}" />
+                                <StackPanel Orientation="Horizontal">
+                                    <StackPanel Orientation="Vertical" >
+                                        <StackPanel
+                                        Orientation="Horizontal"
+                                        Height="25"
+                                        Margin="10,10,10,5">
+                                            <TextBlock Text="File #1" Margin="5" />
+                                            <TextBox x:Name="txtCmprFile1"
+                                                     Foreground="#b3b3b3"
+                                                 VerticalContentAlignment="Center"
+                                                 Text="{Binding FileToCompare1}"
+                                                 ToolTip="{Binding FileToCompare1}"
+                                                 Width="300"
+                                                 Margin="10,0"
+                                                 IsReadOnly="True" />
+                                            <Button
+                                                Width="100"
+                                                Content="Select File"
+                                                HorizontalContentAlignment="Center"
+                                                Command="{Binding OpenFile1DialogCommand}" />
+                                        </StackPanel>
+                                        <StackPanel
+                                            Orientation="Horizontal"
+                                            Height="25"
+                                            Margin="10,5,10,5">
+                                            <TextBlock Text="File #2" Margin="5"/>
+                                            <TextBox x:Name="txtCmprFile2"
+                                                  Foreground="#b3b3b3"
+                                                 VerticalContentAlignment="Center"
+                                                 Text="{Binding FileToCompare2}"
+                                                 ToolTip="{Binding FileToCompare2}"
+                                                 Width="300"
+                                                 Margin="10,0"
+                                                 IsReadOnly="True" />
+                                            <Button
+                                                Width="100"
+                                                Content="Select File"
+                                                HorizontalContentAlignment="Center"
+                                                Command="{Binding OpenFile2DialogCommand}" />
+                                        </StackPanel>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
                                         <Button Content="Compare"
-                                                Command="{Binding CompareLogFilesCommand}"
-                                                IsEnabled="{Binding EnableLogFileComparison}"
-                                                HorizontalAlignment="Right"/>
+                                            Margin="20,5,10,0"
+                                            Padding="5"
+                                            Height="40"
+                                                Width="100"
+                                            Command="{Binding CompareLogFilesCommand}"
+                                            IsEnabled="{Binding EnableLogFileComparison}"
+                                            HorizontalAlignment="Right"/>
                                     </StackPanel>
                                 </StackPanel>
+                                
                             </GroupBox>
                         </Grid>
                         <Grid x:Name="recentProjects" Grid.Row="3" Visibility="{Binding ShowRecentProjects, Converter={StaticResource booleanToVisibilityConverter}}">
